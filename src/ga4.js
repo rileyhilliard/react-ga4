@@ -81,7 +81,8 @@ export class GA4 {
   _loadGA = (
     GA_MEASUREMENT_ID,
     nonce,
-    gtagUrl = "https://www.googletagmanager.com/gtag/js"
+    gtagUrl = "https://www.googletagmanager.com/gtag/js",
+    defer = false
   ) => {
     if (typeof window === "undefined" || typeof document === "undefined") {
       return;
@@ -90,7 +91,11 @@ export class GA4 {
     if (!this._hasLoadedGA) {
       // Global Site Tag (gtag.js) - Google Analytics
       const script = document.createElement("script");
-      script.async = true;
+      if (defer) {
+        script.defer = true;
+      } else {
+        script.async = true;
+      }
       script.src = `${gtagUrl}?id=${GA_MEASUREMENT_ID}`;
       if (nonce) {
         script.setAttribute("nonce", nonce);
@@ -182,7 +187,12 @@ export class GA4 {
     this._testMode = testMode;
 
     if (!testMode) {
-      this._loadGA(this._currentMeasurementId, nonce, gtagUrl);
+      this._loadGA(
+        this._currentMeasurementId,
+        nonce,
+        gtagUrl,
+        gtagOptions.defer
+      );
     }
     if (!this.isInitialized) {
       this._gtag("js", new Date());
